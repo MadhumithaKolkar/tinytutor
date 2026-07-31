@@ -1,0 +1,36 @@
+{
+  "name": "tinytutor",
+  "version": "0.1.0",
+  "description": "Quizzes you on the code Claude Code just wrote, so you actually understand the project you're shipping.",
+  "keywords": [
+    "claude-code",
+    "claude",
+    "hooks",
+    "learning",
+    "code-review",
+    "education"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MadhumithaKolkar/tinytutor.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "tinytutor": "bin/tinytutor.js"
+  },
+  "main": "src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/",
+    "postinstall": "node scripts/postinstall.js"
+  }
+}
