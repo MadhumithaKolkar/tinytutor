@@ -1,6 +1,6 @@
 {
   "name": "tinytutor",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Quizzes you on the code Claude Code just wrote, so you actually understand the project you're shipping.",
   "keywords": [
     "claude-code",

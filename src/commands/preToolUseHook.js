@@ -2,6 +2,7 @@ const path = require("path");
 const { readState, writeState } = require("../lib/state");
 const { readMemory, writeMemory, memoryPath } = require("../lib/memory");
 const { buildQuizInstruction, buildFallbackReminder } = require("../lib/promptTemplate");
+const { BANNER } = require("../lib/banner");
 
 // Safety valve: if a single pending quiz has caused this many denies without
 // memory.json ever gaining an entry, stop trusting Claude to close it out on
@@ -121,12 +122,23 @@ function preToolUseHook() {
   // actual rich quiz content (diff, questions, instructions) goes in
   // additionalContext instead, which the docs describe as "for Claude" —
   // i.e. meant to be consumed, not displayed.
+  //
+  // Since permissionDecisionReason is the one channel guaranteed to render
+  // verbatim (additionalContext gets paraphrased by Claude, so the ASCII art
+  // wouldn't survive intact there), the banner goes here — but only on the
+  // FIRST deny of this quiz, so it marks "a quiz just started" without
+  // repeating on every retry while the user is still answering it.
+  const reason =
+    denyCount === 1
+      ? `${BANNER}quick understanding check before more edits.`
+      : "tinytutor: quick understanding check before more edits.";
+
   process.stdout.write(
     JSON.stringify({
       hookSpecificOutput: {
         hookEventName: "PreToolUse",
         permissionDecision: "deny",
-        permissionDecisionReason: "tinytutor: quick understanding check before more edits.",
+        permissionDecisionReason: reason,
         additionalContext: fullInstruction,
       },
     }) + "\n"

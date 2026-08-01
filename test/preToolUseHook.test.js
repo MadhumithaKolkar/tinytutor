@@ -59,7 +59,7 @@ test("pre-tool-use-hook allows edits (exit 0) when there is no pending quiz", ()
   assert.equal(result.status, 0);
 });
 
-test("pre-tool-use-hook denies further edits with a SHORT visible reason (Claude Code always displays permissionDecisionReason verbatim to the user, confirmed in real testing) and puts the actual quiz content in additionalContext instead", () => {
+test("pre-tool-use-hook denies further edits and puts the actual quiz content in additionalContext, not the visible reason", () => {
   const dir = makeRepo();
   execFileSync(process.execPath, [CLI, "init"], { cwd: dir });
   crossMilestone(dir);
@@ -73,14 +73,27 @@ test("pre-tool-use-hook denies further edits with a SHORT visible reason (Claude
   assert.equal(output.hookSpecificOutput.hookEventName, "PreToolUse");
   assert.equal(output.hookSpecificOutput.permissionDecision, "deny");
 
-  // The visible reason must stay short — it's shown to the user as-is.
-  assert.ok(output.hookSpecificOutput.permissionDecisionReason.length < 100);
+  // The visible reason must never leak the diff content — it's shown to the
+  // user verbatim, unlike additionalContext.
   assert.doesNotMatch(output.hookSpecificOutput.permissionDecisionReason, /a\.js/);
 
   // The real quiz content lives in additionalContext, not the visible reason.
   assert.match(output.hookSpecificOutput.additionalContext, /tinytutor :\)/);
   assert.match(output.hookSpecificOutput.additionalContext, /a\.js/); // one of the files from the stashed diff
   assert.match(output.hookSpecificOutput.additionalContext, /question/i);
+});
+
+test("pre-tool-use-hook shows the ASCII banner in the visible reason on the FIRST deny of a quiz (the one channel guaranteed to render verbatim), but not on subsequent retries of the same quiz", () => {
+  const dir = makeRepo();
+  execFileSync(process.execPath, [CLI, "init"], { cwd: dir });
+  crossMilestone(dir);
+  runStopHook(dir);
+
+  const first = JSON.parse(runPreToolUseHook(dir, { filePath: path.join(dir, "d.js") }).stdout);
+  assert.match(first.hookSpecificOutput.permissionDecisionReason, /understand what you ship/);
+
+  const second = JSON.parse(runPreToolUseHook(dir, { filePath: path.join(dir, "d.js") }).stdout);
+  assert.doesNotMatch(second.hookSpecificOutput.permissionDecisionReason, /understand what you ship/);
 });
 
 test("pre-tool-use-hook exempts writes to memory.json itself, so Claude can always close out the quiz", () => {
