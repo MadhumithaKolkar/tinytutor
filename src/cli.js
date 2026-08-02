@@ -3,16 +3,18 @@
 const { init } = require("./commands/init");
 const { stopHook } = require("./commands/stopHook");
 const { preToolUseHook } = require("./commands/preToolUseHook");
+const { userPromptSubmitHook } = require("./commands/userPromptSubmitHook");
 const { status } = require("./commands/status");
 
 const HELP = `tinytutor — quizzes you on the code Claude Code just wrote.
 
 Usage:
-  tinytutor init [--force]     Set up tinytutor in the current project
-  tinytutor status             Show checkpoint, pending quiz, and weak topics
-  tinytutor stop-hook          (internal) invoked by Claude Code's Stop hook
-  tinytutor pre-tool-use-hook  (internal) invoked by Claude Code's PreToolUse hook
-  tinytutor help                Show this message
+  tinytutor init [--force]        Set up tinytutor in the current project
+  tinytutor status                Show checkpoint, pending quiz, and weak topics
+  tinytutor stop-hook             (internal) invoked by Claude Code's Stop hook
+  tinytutor pre-tool-use-hook     (internal) invoked by Claude Code's PreToolUse hook
+  tinytutor user-prompt-submit-hook  (internal) invoked by Claude Code's UserPromptSubmit hook
+  tinytutor help                  Show this message
 `;
 
 function main(argv) {
@@ -27,6 +29,8 @@ function main(argv) {
       return stopHook();
     case "pre-tool-use-hook":
       return preToolUseHook();
+    case "user-prompt-submit-hook":
+      return userPromptSubmitHook();
     case "help":
     case "--help":
     case "-h":

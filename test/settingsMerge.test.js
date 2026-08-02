@@ -17,13 +17,15 @@ function tempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "tinytutor-settings-"));
 }
 
-test("ensureHookInstalled creates settings.json with both Stop and PreToolUse hooks when missing", () => {
+test("ensureHookInstalled creates settings.json with Stop, PreToolUse, and UserPromptSubmit hooks when missing", () => {
   const dir = tempDir();
   const { changed, settings } = ensureHookInstalled(dir);
   assert.equal(changed, true);
   assert.equal(settings.hooks.Stop.length, 1);
   assert.equal(settings.hooks.PreToolUse.length, 1);
+  assert.equal(settings.hooks.UserPromptSubmit.length, 1);
   assert.match(settings.hooks.PreToolUse[0].matcher, /Edit/);
+  assert.equal(settings.hooks.UserPromptSubmit[0].matcher, undefined); // no matcher support for this event
   writeSettings(dir, settings);
   assert.ok(fs.existsSync(settingsPath(dir)));
 });
@@ -37,6 +39,7 @@ test("ensureHookInstalled is idempotent", () => {
   assert.equal(second.changed, false);
   assert.equal(second.settings.hooks.Stop.length, 1);
   assert.equal(second.settings.hooks.PreToolUse.length, 1);
+  assert.equal(second.settings.hooks.UserPromptSubmit.length, 1);
 });
 
 test("ensureHookInstalled preserves unrelated existing settings and hooks", () => {
