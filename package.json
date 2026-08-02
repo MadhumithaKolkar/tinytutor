@@ -1,6 +1,6 @@
 {
   "name": "tinytutor",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "A comprehension checkpoint for AI-assisted development. Verifies you understand the code Claude Code just wrote before you keep building.",
   "keywords": [
     "claude-code",
