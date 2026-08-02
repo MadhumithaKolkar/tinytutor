@@ -1,6 +1,6 @@
 # tinytutor
 
-<img src="assets/tinytutor.png" alt="tinytutor logo" width="160" />
+<img src="assets/tinytutor.png" alt="tinytutor logo" width="400" />
 
 Quizzes you on the code Claude Code just wrote, so you actually understand the project you're shipping.
 
