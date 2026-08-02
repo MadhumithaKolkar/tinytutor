@@ -1,6 +1,6 @@
 # tinytutor
 
-<img src="assets/tinytutor.png" alt="tinytutor logo" width="1000" />
+<img src="https://cdn.jsdelivr.net/npm/tinytutor/assets/tinytutor.png" alt="tinytutor logo" width="1000" />
 
 **A comprehension checkpoint for AI-assisted development.**
 
