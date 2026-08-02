@@ -30,7 +30,10 @@ function readMemory(projectRoot) {
 function writeMemory(projectRoot, memory) {
   const dir = tinytutorDir(projectRoot);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(memoryPath(projectRoot), JSON.stringify(memory, null, 2) + "\n", "utf8");
+  const target = memoryPath(projectRoot);
+  const tmp = path.join(dir, `memory.json.tmp-${process.pid}-${Date.now()}`);
+  fs.writeFileSync(tmp, JSON.stringify(memory, null, 2) + "\n", "utf8");
+  fs.renameSync(tmp, target);
 }
 
 module.exports = { memoryPath, defaultMemory, readMemory, writeMemory };

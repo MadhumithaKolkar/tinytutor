@@ -12,7 +12,7 @@ function status() {
   }
 
   const memory = readMemory(projectRoot);
-  const diff = diffSinceCheckpoint(state.checkpointRef, projectRoot);
+  const diff = diffSinceCheckpoint(state.checkpointRef, projectRoot, state.config?.excludePatterns);
 
   console.log(`Checkpoint:      ${state.checkpointRef.slice(0, 12)}`);
   console.log(`Quiz pending:    ${state.quizPending}`);

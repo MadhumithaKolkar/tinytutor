@@ -1,6 +1,6 @@
 {
   "name": "tinytutor",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A comprehension checkpoint for AI-assisted development. Verifies you understand the code Claude Code just wrote before you keep building.",
   "keywords": [
     "claude-code",
@@ -31,7 +31,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test test/*.test.js",
     "postinstall": "node scripts/postinstall.js"
   }
 }

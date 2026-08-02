@@ -56,7 +56,7 @@ function stopHook() {
     return;
   }
 
-  const diff = diffSinceCheckpoint(state.checkpointRef, projectRoot);
+  const diff = diffSinceCheckpoint(state.checkpointRef, projectRoot, state.config?.excludePatterns);
 
   if (!diff) {
     // Git unavailable, or the checkpoint object was pruned/rewritten.

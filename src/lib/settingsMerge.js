@@ -96,6 +96,39 @@ function ensureHookInstalled(projectRoot) {
   return { changed, settings };
 }
 
+function removeHookInstalled(projectRoot) {
+  const settings = readSettings(projectRoot);
+  let changed = false;
+
+  if (settings.hooks) {
+    const events = ["Stop", "PreToolUse", "UserPromptSubmit"];
+    const markers = [STOP_HOOK_MARKER, PRE_TOOL_USE_HOOK_MARKER, USER_PROMPT_SUBMIT_HOOK_MARKER];
+
+    events.forEach((event) => {
+      if (Array.isArray(settings.hooks[event])) {
+        const initialLen = settings.hooks[event].length;
+        settings.hooks[event] = settings.hooks[event].filter(
+          (entry) =>
+            !Array.isArray(entry?.hooks) ||
+            !entry.hooks.some((h) => typeof h?.command === "string" && markers.some((m) => h.command.includes(m)))
+        );
+        if (settings.hooks[event].length !== initialLen) {
+          changed = true;
+        }
+        if (settings.hooks[event].length === 0) {
+          delete settings.hooks[event];
+        }
+      }
+    });
+
+    if (Object.keys(settings.hooks).length === 0) {
+      delete settings.hooks;
+    }
+  }
+
+  return { changed, settings };
+}
+
 function writeSettings(projectRoot, settings) {
   const dir = path.join(projectRoot, ".claude");
   fs.mkdirSync(dir, { recursive: true });
@@ -107,6 +140,7 @@ module.exports = {
   readSettings,
   hasTinytutorHook,
   ensureHookInstalled,
+  removeHookInstalled,
   writeSettings,
   STOP_HOOK_MARKER,
   PRE_TOOL_USE_HOOK_MARKER,

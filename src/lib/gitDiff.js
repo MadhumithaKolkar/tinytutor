@@ -15,7 +15,19 @@ const MAX_FILES_LISTED = 20;
 
 // tinytutor's own bookkeeping files shouldn't count toward the diff that
 // triggers a quiz about the user's code.
-const PATHSPEC = [".", ":(exclude).tinytutor", ":(exclude).claude"];
+const BASE_PATHSPEC = [".", ":(exclude).tinytutor", ":(exclude).claude"];
+
+function buildPathspec(customExcludes = []) {
+  const pathspec = [...BASE_PATHSPEC];
+  if (Array.isArray(customExcludes)) {
+    for (const pattern of customExcludes) {
+      if (pattern && typeof pattern === "string") {
+        pathspec.push(`:(exclude)${pattern}`);
+      }
+    }
+  }
+  return pathspec;
+}
 
 function run(args, cwd, env) {
   return execFileSync("git", args, {
@@ -115,18 +127,19 @@ function protectCheckpoint(cwd, sha) {
 // tree into an ephemeral commit and diffing checkpointRef against it. Returns
 // null if git is unavailable or the checkpoint ref no longer resolves (e.g.
 // its object was pruned).
-function diffSinceCheckpoint(checkpointRef, cwd) {
+function diffSinceCheckpoint(checkpointRef, cwd, customExcludes = []) {
   if (!isGitRepo(cwd)) return null;
   if (!refExists(checkpointRef, cwd)) return null;
 
   const snapshotRef = snapshotWorkingTree(cwd, checkpointRef);
+  const pathspec = buildPathspec(customExcludes);
 
-  const shortstat = run(["diff", "--shortstat", checkpointRef, snapshotRef, "--", ...PATHSPEC], cwd).trim();
+  const shortstat = run(["diff", "--shortstat", "--no-ext-diff", checkpointRef, snapshotRef, "--", ...pathspec], cwd).trim();
   const stat = parseShortstat(shortstat);
 
   let changedFiles = [];
   try {
-    changedFiles = run(["diff", "--name-only", checkpointRef, snapshotRef, "--", ...PATHSPEC], cwd)
+    changedFiles = run(["diff", "--name-only", "--no-ext-diff", checkpointRef, snapshotRef, "--", ...pathspec], cwd)
       .trim()
       .split("\n")
       .filter(Boolean);
@@ -137,7 +150,7 @@ function diffSinceCheckpoint(checkpointRef, cwd) {
   let diffText = "";
   let truncated = false;
   try {
-    diffText = run(["diff", checkpointRef, snapshotRef, "--", ...PATHSPEC], cwd);
+    diffText = run(["diff", "--no-color", "--no-ext-diff", checkpointRef, snapshotRef, "--", ...pathspec], cwd);
     if (diffText.length > MAX_DIFF_CHARS) {
       diffText = diffText.slice(0, MAX_DIFF_CHARS);
       truncated = true;
@@ -167,4 +180,5 @@ module.exports = {
   snapshotWorkingTree,
   protectCheckpoint,
   diffSinceCheckpoint,
+  buildPathspec,
 };

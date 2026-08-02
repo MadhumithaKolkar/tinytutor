@@ -6,6 +6,7 @@ const STATE_VERSION = 1;
 const DEFAULT_CONFIG = {
   linesThreshold: 80,
   filesThreshold: 3,
+  excludePatterns: ["package-lock.json", "pnpm-lock.yaml", "yarn.lock"],
 };
 
 function tinytutorDir(projectRoot) {
@@ -45,7 +46,11 @@ function readState(projectRoot) {
   if (!fs.existsSync(file)) return null;
   try {
     const parsed = JSON.parse(fs.readFileSync(file, "utf8"));
-    return { ...defaultState(parsed.checkpointRef), ...parsed };
+    return {
+      ...defaultState(parsed.checkpointRef),
+      ...parsed,
+      config: { ...DEFAULT_CONFIG, ...(parsed.config || {}) },
+    };
   } catch {
     return null;
   }
@@ -54,7 +59,10 @@ function readState(projectRoot) {
 function writeState(projectRoot, state) {
   const dir = tinytutorDir(projectRoot);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(statePath(projectRoot), JSON.stringify(state, null, 2) + "\n", "utf8");
+  const target = statePath(projectRoot);
+  const tmp = path.join(dir, `state.json.tmp-${process.pid}-${Date.now()}`);
+  fs.writeFileSync(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
+  fs.renameSync(tmp, target);
 }
 
 module.exports = { tinytutorDir, statePath, defaultState, readState, writeState, DEFAULT_CONFIG };
