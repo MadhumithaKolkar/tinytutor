@@ -10,4 +10,4 @@ const ART = String.raw`
 
 const BANNER = `${ART}   understand what you ship\n`;
 
-module.exports = { BANNER };
+module.exports = { BANNER, ART };
