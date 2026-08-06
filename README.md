@@ -2,7 +2,7 @@
 
 <img src="https://cdn.jsdelivr.net/npm/tinytutor/assets/tinytutor.png" alt="tinytutor logo" width="1000" />
 
-**A comprehension checkpoint for AI-assisted development.**
+**A comprehension checkpoint for AI-assisted development. **
 
 AI coding assistants make it trivially easy to ship code you never actually understood. tinytutor closes that gap: it integrates directly into a Claude Code session and, at defined milestones in the work, verifies that you can explain what was just built before you're allowed to keep building. Incorrect or uncertain answers are met with a plain-language explanation, not a pass. Over time, tinytutor tracks the concepts you consistently struggle with and brings them back for review.
 
