@@ -35,6 +35,12 @@ function run(args, cwd, env) {
     encoding: "utf8",
     maxBuffer: 1024 * 1024 * 32,
     env: env ? { ...process.env, ...env } : process.env,
+    // Without this, execFileSync inherits stderr straight to the terminal,
+    // so an expected/handled failure (e.g. `rev-parse HEAD` on a repo with
+    // no commits yet, caught by currentHead()'s try/catch) still leaks a
+    // raw "fatal: ..." line to the user even though nothing actually failed
+    // from their point of view.
+    stdio: ["pipe", "pipe", "pipe"],
   });
 }
 
